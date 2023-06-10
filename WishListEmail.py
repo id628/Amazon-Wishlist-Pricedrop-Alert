@@ -7,8 +7,10 @@ from os.path import exists
 import smtplib
 from email.message import EmailMessage
 
+# Based on https://shkspr.mobi/blog/2022/01/use-python-to-get-alerted-when-an-amazon-wishlist-item-drops-in-price/
+
 #   Config - change these!
-wishlist_url   = "https://www.amazon.co.uk/gp/registry/wishlist/1A1NYHTAZ3N6V/"
+wishlist_url   = "https://www.amazon.com/hz/wishlist/ls/2S5K16UEZHN3Q"
 email_user     = 'me@example.com'
 email_password = 'P455w0rd!'
 email_to       = 'you@example.com'
@@ -52,7 +54,7 @@ def get_paginator(soup):
     if soup.find("div", {"id": "endOfListMarker"}) is None:
         #   If the end tag doesn't exist, continue
         for match in soup.find_all('input', class_="showMoreUrl"):
-            paginator = "https://www.amazon.co.uk" + match.attrs["value"]
+            paginator = "https://www.amazon.com" + match.attrs["value"]
     else:
         paginator = None
     return paginator
@@ -113,10 +115,12 @@ for id in new_prices["ID"]:
             message += (name + "\n£" + str(new_price) + " was £" + str(old_price) + " https://www.amazon.co.uk/dp/"+id + "\n")
         elif float(new_price) < float(old_price) and float(new_price) > 0:
             message += (name + "\n£" + str(new_price) + " was £" + str(old_price) + " https://www.amazon.co.uk/dp/"+id + "\n")
+        #Now I want to log this to the console
+        # print(name + "\n£" + str(new_price) + " was £" + str(old_price) + " https://www.amazon.co.uk/dp/"+id + "\n")
 
 #   Send the email with the price drop alert
-#print(message)
-send_email(message)
+print(message)
+#send_email(message)
 
 #   Save the Data
 new_prices.to_csv('old_prices.csv', index=False)
